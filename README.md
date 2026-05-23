@@ -93,6 +93,22 @@ vscode-faust-runner/
 
 Produces `<publisher>.<name>-<version>.vsix` in the project root. No `npm install` or `vsce` required.
 
+## Built for
+
+This extension grew out of two HISE-based synthesizer plugins from [Morphoice](https://www.morphoice.com/plugins) — every feature in the runner exists because something needed measuring or auditioning while voicing them.
+
+### [Unstable](https://www.morphoice.com/unstable) — Yamaha CS-80 emulation
+
+The oscilloscope's L/R/Lissajous mode, the analyzer's frequency-response overlay, and the scope persistence were built while voicing Unstable's VCF, ring-mod, and chorus sections.
+
+[![Unstable](https://www.morphoice.com/images/unstable-screenshot.jpg)](https://www.morphoice.com/unstable)
+
+### [HexaDrum](https://www.morphoice.com/hexadrum) — Simmons SDS-V drum module
+
+The triggered scope, hot reload, and click/impulse test signals were built while voicing HexaDrum's kick and tom Faust DSPs.
+
+[![HexaDrum](https://www.morphoice.com/images/hexadrum-screenshot.jpg)](https://www.morphoice.com/hexadrum)
+
 ## License
 
 [MIT](LICENSE)
