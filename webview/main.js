@@ -428,7 +428,8 @@ async function compileAndAttach({ recompileOnly = false } = {}) {
     const configuredVoices = Math.max(1, Number(window.__faustInit?.voices || 8));
     const declaredVoices = getNvoices(meta);
     const voices = declaredVoices > 0 ? declaredVoices : configuredVoices;
-    const usePoly = declaredVoices > 0 || (!!ui.polyOn?.checked && voices > 1 && hasPolyVoiceControls(descriptor));
+    // [nvoices:1] is HISE's "monophonic + MIDI" hint, not a poly request — only force poly for N>1.
+    const usePoly = declaredVoices > 1 || (!!ui.polyOn?.checked && voices > 1 && hasPolyVoiceControls(descriptor));
 
     if (usePoly) {
       gen = new FaustPolyDspGenerator();
