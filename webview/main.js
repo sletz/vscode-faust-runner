@@ -11,7 +11,7 @@ import {
   makeMic, makeFile, decodeBytes, disposeSource
 } from './signals.js';
 
-const FAUST_CDN  = 'https://cdn.jsdelivr.net/npm/@grame/faustwasm@0.4.10';
+const FAUST_CDN  = 'https://cdn.jsdelivr.net/npm/@grame/faustwasm@0.16.2';
 const FAUSTUI_CDN = 'https://cdn.jsdelivr.net/npm/@shren/faust-ui@1';
 
 const vscode = acquireVsCodeApi();
