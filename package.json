@@ -1,0 +1,73 @@
+{
+  "name": "vscode-faust-runner",
+  "displayName": "Faust Runner",
+  "description": "Live Faust DSP compile/play with triggered oscilloscope, spectrum analyzer, hardware/QWERTY MIDI, and swappable test signals inside the VS Code bottom panel. Optional HISE plugin lint.",
+  "version": "0.1.40",
+  "publisher": "morphoice",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morphoice/vscode-faust-runner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/morphoice/vscode-faust-runner/issues"
+  },
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other", "Programming Languages"],
+  "keywords": ["faust", "dsp", "audio", "oscilloscope", "spectrum", "hise"],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:faust",
+    "workspaceContains:**/*.dsp"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "panel": [
+        { "id": "faustPanel", "title": "Faust", "icon": "$(pulse)" }
+      ]
+    },
+    "views": {
+      "faustPanel": [
+        { "type": "webview", "id": "faust.runner", "name": "Runner", "contextualTitle": "Faust Runner" }
+      ]
+    },
+    "commands": [
+      { "command": "faust.run",      "title": "Run DSP in panel",      "category": "Faust", "icon": "$(play)" },
+      { "command": "faust.stop",     "title": "Stop DSP",              "category": "Faust", "icon": "$(debug-stop)" },
+      { "command": "faust.validate", "title": "Validate current file", "category": "Faust" },
+      { "command": "faust.showSVG",  "title": "Show block diagram",    "category": "Faust", "icon": "$(circuit-board)" }
+    ],
+    "menus": {
+      "editor/title": [
+        { "command": "faust.run",     "when": "resourceExtname == .dsp && !faustPlaying", "group": "navigation@1" },
+        { "command": "faust.stop",    "when": "resourceExtname == .dsp &&  faustPlaying", "group": "navigation@1" },
+        { "command": "faust.showSVG", "when": "resourceExtname == .dsp", "group": "navigation@2" }
+      ]
+    },
+    "configuration": {
+      "title": "Faust",
+      "properties": {
+        "faust.binary": {
+          "type": "string",
+          "default": "faust",
+          "description": "Path to the Faust compiler. Use a bare 'faust' to resolve from $PATH, or an absolute path."
+        },
+        "faust.libraryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path passed to the compiler as -I (Faust standard library). Leave empty to use the compiler's built-in default."
+        },
+        "faust.hiseLint": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply HISE-specific lint rules when a .dsp file is inside a HISE DspNetworks/CodeLibrary/faust folder. Harmless for non-HISE projects (the rules only activate on HISE folder layouts)."
+        },
+        "faust.polyphony": {
+          "type": "integer",
+          "default": 8,
+          "description": "Number of voices when polyphonic mode is enabled in the runner."
+        }
+      }
+    }
+  }
+}

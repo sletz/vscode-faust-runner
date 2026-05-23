@@ -1,0 +1,137 @@
+:root {
+  /* VS Code theme — used for chrome (header, transport, dropdowns, scope/analyzer controls, log strip) */
+  --bg:    var(--vscode-panel-background, #1e1e1e);
+  --bg2:   var(--vscode-editor-background, #161616);
+  --fg:    var(--vscode-foreground, #ddd);
+  --mut:   var(--vscode-descriptionForeground, #888);
+  --acc:   var(--vscode-focusBorder, #5fa8ff);
+  --bord:  var(--vscode-panel-border, #333);
+  --warn:  #c89048;
+  --err:   #c8504a;
+  --ok:    #9fd75f;
+
+  /* Morphoice palette — used inside parameter pane & on scope/analyzer canvases */
+  --m-bg:    #211623;
+  --m-bg2:   #271D45;
+  --m-bg3:   #160E1A;        /* scope / analyzer canvas */
+  --m-fg:    #E7DCF0;
+  --m-mut:   #9B86A6;
+  --m-acc:   #C568CC;        /* magenta */
+  --m-acc2:  #8F66C6;        /* purple */
+  --m-acc3:  #B692C2;        /* mauve */
+  --m-bord:  #4A3458;
+  --m-track: #3A2A45;        /* knob track arc */
+
+  --trace-a:    var(--m-acc);    /* L / output */
+  --trace-b:    var(--m-acc3);   /* R / input overlay */
+  --trace-peak: var(--m-acc2);   /* peak hold */
+}
+
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--fg); font:11px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+
+#app { display:flex; flex-direction:column; height:100vh; }
+
+header { padding:4px 6px; border-bottom:1px solid var(--bord); flex:0 0 auto; background:var(--bg); }
+header .row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:2px 0; }
+header .sep { width:1px; align-self:stretch; background:var(--bord); margin:0 4px; }
+header button, header select, header input[type=range] { font:inherit; background:var(--bg2); color:var(--fg); border:1px solid var(--bord); padding:2px 6px; border-radius:3px; }
+header button { cursor:pointer; }
+header button:hover { border-color:var(--acc); }
+header button.on { background:var(--acc); color:var(--bg); border-color:var(--acc); }
+header input[type=range] { padding:0; height:14px; vertical-align:middle; }
+header label { display:inline-flex; align-items:center; gap:4px; color:var(--mut); }
+header input[type=checkbox] { margin:0; }
+.status { margin-left:auto; color:var(--mut); font-variant-numeric: tabular-nums; }
+.status.err { color:var(--err); }
+.status.ok  { color:var(--ok); }
+
+#kbdRow { display:none; flex:0 0 auto; padding:4px 6px; border-top:1px solid var(--bord); background:var(--bg); overflow-x:auto; }
+#kbd { display:flex; user-select:none; position:relative; height:50px; min-width:max-content; }
+#kbd .key { border:1px solid var(--bord); background:#eaeaea; color:#222; width:22px; height:50px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px; font-size:9px; cursor:pointer; }
+#kbd .key.bk { background:#222; color:#aaa; width:14px; height:32px; margin-left:-7px; margin-right:-7px; z-index:2; }
+#kbd .key.on { background:var(--acc); color:#fff; }
+
+#grid {
+  flex:1 1 auto; display:grid; gap:0; background:var(--bord); min-height:0;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: var(--paramH, 140px) 1px 1fr;
+  grid-template-areas:
+    "params   params"
+    "resizer  resizer"
+    "scope    analyzer";
+}
+#paramPane { grid-area: params; min-height: 28px; }
+#vresizer  { grid-area: resizer; cursor: ns-resize; background: var(--bord); position: relative; }
+#vresizer::after { content:""; position:absolute; left:0; right:0; top:-2px; bottom:-2px; }
+#vresizer:hover, #vresizer.dragging { background: var(--m-acc); }
+#scopePane { grid-area: scope; }
+#anaPane   { grid-area: analyzer; }
+#grid section { background:var(--bg); padding:4px 6px; overflow:hidden; display:flex; flex-direction:column; min-height:0; }
+#paramPane #faust-ui { overflow:auto; flex:1; display:flex; flex-flow:row wrap; align-items:flex-start; gap:6px 8px; padding-top:2px; }
+#paramPane #faust-ui > * { flex: 0 0 auto; }
+
+/* Faust UI native controls — Morphoice-themed inside #paramPane */
+.fui-group { display:flex; flex-flow:row wrap; gap:6px 8px; align-items:flex-start; padding:2px 8px 4px; border-left:1px solid var(--m-bord); }
+.fui-group:first-child { border-left:0; padding-left:0; }
+.fui-group-label { width:100%; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; color:var(--m-mut); margin-bottom:2px; }
+.fui-group-body { display:flex; flex-flow:row wrap; gap:6px 8px; align-items:flex-start; }
+
+.fui-ctl { display:flex; flex-direction:column; width:72px; gap:2px; align-items:center; }
+.fui-ctl.fui-button, .fui-ctl.fui-checkbox { width:auto; }
+.fui-ctl.fui-nentry { width:70px; }
+
+.fui-head { width:100%; display:flex; flex-direction:column; align-items:center; gap:0; font-size:10px; }
+.fui-lbl { color:var(--m-fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:default; max-width:72px; text-align:center; line-height:1.1; }
+.fui-val { color:var(--m-mut); font-variant-numeric:tabular-nums; font-size:9px; line-height:1; }
+
+.fui-knob-canvas { cursor:ns-resize; touch-action:none; display:block; outline:none; border-radius:50%; }
+.fui-knob-canvas:focus { box-shadow: 0 0 0 1px var(--m-acc); }
+
+.fui-nentry-input { width:60px; padding:2px 4px; background:var(--m-bg2); color:var(--m-fg); border:1px solid var(--m-bord); border-radius:2px; font:inherit; font-size:10px; }
+
+.fui-button button { background:var(--m-bg2); color:var(--m-fg); border:1px solid var(--m-bord); padding:4px 10px; border-radius:3px; cursor:pointer; font-size:10px; height:24px; }
+.fui-button button.on { background:var(--m-acc); color:#fff; border-color:var(--m-acc); }
+
+.fui-checkbox { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--m-fg); cursor:pointer; padding:4px 0; }
+
+.fui-meter { width:130px; }
+.fui-bar { height:6px; background:var(--m-bg3); border:1px solid var(--m-bord); border-radius:2px; overflow:hidden; }
+.fui-bar-fill { height:100%; background:var(--m-acc); width:0%; transition:width 60ms linear; }
+#grid section h3 { font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--mut); margin:0 0 4px 0; font-weight:600; display:flex; align-items:center; gap:6px; }
+#grid section h3 small { color:var(--mut); font-weight:400; text-transform:none; letter-spacing:0; }
+.ctlrow { display:flex; flex-wrap:wrap; gap:4px 6px; padding:2px 0 4px; align-items:center; color:var(--mut); }
+.ctlrow select, .ctlrow input[type=range], .ctlrow input[type=number] { font:inherit; background:var(--bg2); color:var(--fg); border:1px solid var(--bord); border-radius:2px; padding:1px 3px; height:18px; }
+.ctlrow input[type=number] { width:54px; }
+.ctlrow button { font:inherit; background:var(--bg2); color:var(--fg); border:1px solid var(--bord); border-radius:2px; padding:1px 6px; cursor:pointer; }
+.ctlrow button.on { background:var(--acc); color:var(--bg); border-color:var(--acc); }
+.ctlrow label { display:inline-flex; align-items:center; gap:2px; }
+
+.canvasWrap { position:relative; flex:1 1 auto; min-height:0; }
+.canvasWrap canvas { position:absolute; inset:0; width:100%; height:100%; background:var(--m-bg3); border:1px solid var(--bord); border-radius:2px; image-rendering:pixelated; }
+.ctlrow.overlay { position:absolute; top:4px; left:4px; right:4px; z-index:2; opacity:0; pointer-events:none; transition:opacity 120ms ease-out; background:rgba(20,16,28,0.78); padding:3px 6px; border-radius:3px; backdrop-filter:blur(4px); }
+.canvasWrap:hover .ctlrow.overlay, .ctlrow.overlay:focus-within { opacity:1; pointer-events:auto; }
+
+/* Morphoice-tinted parameter pane (everything else uses the VS Code theme) */
+#paramPane { background:var(--m-bg); color:var(--m-fg); }
+
+#errBar { display:none; flex:0 0 auto; border-top:1px solid var(--err); background:#3a1818; align-items:flex-start; gap:6px; padding:2px 4px; max-height:80px; }
+#errBar pre { margin:0; flex:1; overflow:auto; font:10px/1.35 ui-monospace, Menlo, monospace; color:#ffd0c8; white-space:pre-wrap; padding:2px 4px; }
+#errBar pre .err { color:#ffd0c8; }
+#errDismiss { background:transparent; color:#ffd0c8; border:0; cursor:pointer; font-size:14px; line-height:1; padding:2px 6px; }
+#errDismiss:hover { color:#fff; }
+
+/* Compactness for faust-ui */
+#faust-ui { font-size: 10px; }
+#faust-ui .faust-ui-component { margin: 2px 0; }
+
+/* Responsive: only stack scope+analyzer when truly tiny */
+@media (max-width: 480px) {
+  #grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "params"
+      "scope"
+      "analyzer";
+  }
+}
