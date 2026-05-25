@@ -277,7 +277,10 @@ async function ensureFaust() {
 // addModule strategies handle CSP and URI quirks across VS Code webview builds.
 async function ensureCtx() {
   if (state.ctx) return;
-  state.ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  // Larger output buffer (playback latencyHint) gives the AudioWorklet more headroom per render
+  // quantum — necessary for heavy feedback DSPs like multi-tap reverbs that hit deadline limits
+  // on interactive (sub-10 ms) buffers.
+  state.ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'playback', sampleRate: 48000 });
 
   const workletUrl = new URL('./capture-worklet.js', import.meta.url).toString();
   const attempts = [];
@@ -465,7 +468,7 @@ async function compileAndAttach({ recompileOnly = false } = {}) {
   try {
     const { FaustMonoDspGenerator, FaustPolyDspGenerator } = state.faustModule;
     let gen = new FaustMonoDspGenerator();
-    await gen.compile(state.compiler, state.dspName, state.dspCode, '-I libraries/');
+    await gen.compile(state.compiler, state.dspName, state.dspCode, '-I libraries/ -ftz 2');
     let descriptor = [];
     try { descriptor = gen.getUI ? gen.getUI() : []; } catch (e) {}
     let meta = null;
@@ -478,7 +481,7 @@ async function compileAndAttach({ recompileOnly = false } = {}) {
 
     if (usePoly) {
       gen = new FaustPolyDspGenerator();
-      await gen.compile(state.compiler, state.dspName, state.dspCode, '-I libraries/');
+      await gen.compile(state.compiler, state.dspName, state.dspCode, '-I libraries/ -ftz 2');
     }
 
     const newNode = usePoly ? await gen.createNode(state.ctx, voices) : await gen.createNode(state.ctx);
@@ -493,6 +496,14 @@ async function compileAndAttach({ recompileOnly = false } = {}) {
     }
     state.faustNode = newNode;
     state.polyphonic = usePoly;
+
+    // Surface AudioWorklet runtime errors (Faust processor throws → audio silently stops)
+    newNode.onprocessorerror = (ev) => {
+      const e = ev && ev.error ? ev.error : ev;
+      const msg = 'Faust worklet crashed: ' + (e && (e.message || e.toString())) + (e && e.stack ? '\n' + e.stack : '');
+      log(msg, 'err');
+      postInfo('Faust worklet crashed — ' + (e && (e.message || e.toString() || 'no detail')), 'err');
+    };
 
     // wire: src -> captureIn -> faust -> captureOut
     rewireSource();

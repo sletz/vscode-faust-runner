@@ -2,7 +2,7 @@
   "name": "vscode-faust-runner",
   "displayName": "Faust Runner",
   "description": "Live Faust DSP compile/play with triggered oscilloscope, spectrum analyzer, hardware/QWERTY MIDI, and swappable test signals inside the VS Code bottom panel. Optional HISE plugin lint.",
-  "version": "0.1.43",
+  "version": "0.1.48",
   "publisher": "morphoice",
   "license": "MIT",
   "repository": {
